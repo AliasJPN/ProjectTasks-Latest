@@ -9,30 +9,51 @@ use Illuminate\Support\Facades\Auth;
 
 class TaskController extends Controller
 {
-
     public function store(Request $request, Project $project)
     {
-        if (Auth::check()) {
-            $task = new Task();
-            $task->fill([
-                'task_name' => $request->task_name,
-                'project_id' => $project->id,
-                'status' => '',
-                'priority' => '',
-            ]);
-
-            $task->save();
+        if (!Auth::check()) {
+            return redirect('/');
         }
 
-        return redirect()->route('projects.show', $project->id)->with([
-            'project' => $project,
-            'tasks' => $project->tasks,
-            'users' => $project->users,
+        $user = Auth::user();
+
+        if (!$user->projects()->find($project->id)) {
+            return redirect('/');
+        }
+
+        $request->validate([
+            'task_name' => 'required|string|max:255',
         ]);
+
+        $task = new Task();
+        $task->fill([
+            'task_name' => $request->task_name,
+            'project_id' => $project->id,
+            'status' => '',
+            'priority' => '',
+        ]);
+
+        $task->save();
+
+        return redirect()->route('projects.show', $project->id);
     }
 
     public function update(Request $request, Project $project, Task $task)
     {
+        if (!Auth::check()) {
+            return redirect('/');
+        }
+
+        $user = Auth::user();
+
+        if (!$user->projects()->find($project->id)) {
+            return redirect('/');
+        }
+
+        if ($task->project_id !== $project->id) {
+            return redirect('/');
+        }
+
         $validatedData = $request->validate([
             'task_name' => 'nullable|string|max:255',
             'project_id' => 'exists:projects,id',
@@ -43,10 +64,6 @@ class TaskController extends Controller
             'assigned_project_member_id' => 'nullable|exists:users,id',
         ]);
 
-        if ($task->project_id !== $project->id) {
-            abort(403, 'このタスクは指定されたプロジェクトに属していません。');
-        }
-
         $task->update($validatedData);
 
         return redirect()->route('projects.show', [
@@ -56,11 +73,21 @@ class TaskController extends Controller
 
     public function destroy(Project $project, Task $task)
     {
+        if (!Auth::check()) {
+            return redirect('/');
+        }
+
         $user = Auth::user();
 
-        if ($user->projects()->where('project_id', $project->id)->exists() && $task->project_id === $project->id) {
-            $task->delete();
+        if (!$user->projects()->find($project->id)) {
+            return redirect('/');
         }
+
+        if ($task->project_id !== $project->id) {
+            return redirect('/');
+        }
+
+        $task->delete();
 
         return redirect()->route('projects.show', $project->id);
     }
