@@ -9,7 +9,7 @@
         @vite('resources/js/app.js')
     </head>
 
-    <body>
+    <body class="flex flex-col min-h-screen">
 
         {{-- ナビゲーションバー --}}
         @include('commons.navbar')
