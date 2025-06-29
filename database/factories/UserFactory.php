@@ -38,4 +38,13 @@ class UserFactory extends Factory
             'password' => bcrypt('password'), // bcryptでハッシュ化
         ]);
     }
+
+    public function testUser2(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'name' => 'Test User 2',
+            'email' => 'test2@example.com',
+            'password' => bcrypt('password'), // bcryptでハッシュ化
+        ]);
+    }
 }

@@ -14,11 +14,12 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        // アクセスしやすいテストユーザーを1人作成
+        // アクセスしやすいテストユーザーを2人作成
         User::factory()->testUser()->create();
+        User::factory()->testUser2()->create();
 
         // 追加のダミーユーザーを作成 (合計10人になるように)
-        User::factory(9)->create();
+        User::factory(8)->create();
 
         // --- 中間テーブル (project_members) のデータ挿入 ---
         // Project のデータが既に存在することを前提とします。
