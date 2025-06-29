@@ -9,10 +9,9 @@
                 <h3 class="font-bold text-lg">タスク編集</h3>
                 <p class="py-4">タスクの詳細を編集してください</p>
 
-                <form action="{{ route('tasks.update', ['task' => $task->id]) }}" method="POST">
+                <form action="{{ route('tasks.update', ['project' => $task->project_id, 'task' => $task->id]) }}" method="POST">
                     @csrf
                     @method('PUT')
-                    <input type="hidden" name="project_id" value="{{ $task->project_id }}">
 
                     <div class="form-control w-full mb-4">
                         <label class="label">
@@ -64,7 +63,7 @@
                             <span class="label-text">期限開始日</span>
                         </label>
                         <input type="date" name="due_date_start"
-                            value="{{ $task->due_date_start ? \Carbon\Carbon::parse($task->due_date_start)->format('Y-m-d') : '' }}"
+                            value="{{ $task->getFormattedDate('due_date_start', 'Y-m-d') }}"
                             class="input input-bordered w-full" />
                     </div>
                     <div class="form-control w-full mb-4">
@@ -72,7 +71,7 @@
                             <span class="label-text">期限終了日</span>
                         </label>
                         <input type="date" name="due_date_end"
-                            value="{{ $task->due_date_end ? \Carbon\Carbon::parse($task->due_date_end)->format('Y-m-d') : '' }}"
+                            value="{{ $task->getFormattedDate('due_date_end', 'Y-m-d') }}"
                             class="input input-bordered w-full" />
                     </div>
 

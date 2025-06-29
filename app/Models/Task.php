@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Carbon\Carbon;
 
 class Task extends Model
 {
@@ -19,7 +21,19 @@ class Task extends Model
         'due_date_end',
     ];
 
+    protected $casts = [
+        'due_date_start' => 'datetime',
+        'due_date_end' => 'datetime',
+    ];
+
     public function project() {
         return $this->belongsTo(Project::class);
+    }
+
+    public function getFormattedDate(string $column, string $format = 'Y年m月d日'): ?string
+    {
+        $date = $this->$column;
+
+        return $date ? $date->format($format) : null;
     }
 }

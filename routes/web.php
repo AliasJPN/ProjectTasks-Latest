@@ -1,15 +1,10 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TaskController;
 
 use Illuminate\Support\Facades\Route;
-
-use App\Models\User;
-use App\Models\Project;
-use App\Models\Task;
 
 
 /*
@@ -27,21 +22,21 @@ Route::get('/', [ProjectController::class, 'index']);
 
 Route::middleware('auth')->group(function () {
 
-    // プロジェクトのリソースルート
     Route::resource('projects', ProjectController::class)->except([
         'create', 'edit'
     ]);
 
-    // タスクのリソースルート（プロジェクトにネスト）
-    Route::resource('tasks', TaskController::class)->only([
-        'store','update', 'destroy'
-    ]);
+    Route::prefix('projects/{project}')->group(function () {
 
-    Route::resource('users', UserController::class)->only([
-        'index','store', 'destroy'
-    ]);
+        Route::resource('tasks', TaskController::class)->only([
+            'store', 'update', 'destroy'
+        ]);
 
-    //コメントアウト予定
+        Route::resource('users', UserController::class)->only([
+            'index', 'store', 'destroy'
+        ]);
+    });
+
     // Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     // Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     // Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

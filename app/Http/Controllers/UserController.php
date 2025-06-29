@@ -9,55 +9,46 @@ use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
-    public function index(Request $request)
+    public function index(Project $project) // $projectはルートからバインドされたProjectモデル
     {
         $user = Auth::user();
-        $project = $user->projects()->find($request->project_id);
-        $users = $project->users()->get();
+
+        // 認証ユーザーのプロジェクトリレーションシップから、指定されたプロジェクトを再取得
+        // これにより、$projectインスタンスに$userとの関係におけるpivot情報が含まれる
+        $projectWithPivot = $user->projects()->where('project_id', $project->id)->firstOrFail();
+
+        // プロジェクトに紐づくユーザー（メンバー）を取得
+        $users = $projectWithPivot->users()->get();
 
         return view('members.index',[
             'members' => $users,
-            'project' => $project,
+            'project' => $projectWithPivot, // ピボット情報が含まれた$projectをビューに渡す
         ]);
     }
-
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, Project $project)
     {
-        // ユーザ名を取得し、ユーザを検索
-        $user = User::where('name', $request->member)->firstOrFail();
+        $userToAdd = User::where('name', $request->member)->firstOrFail();
 
-        $project = Project::find($request->project_id);
-
-        // ユーザをプロジェクトに追加
-        $project->users()->attach($user->id, ['role' => 'General']);
+        $project->users()->attach($userToAdd->id, ['role' => 'General']);
 
         return redirect()->route('users.index',[
-            'project_id' => $project->id,
+            'project' => $project->id,
         ]);
     }
-
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Request $request, string $id)
+    public function destroy(Project $project, User $user)
     {
-        $user = Auth::user();
+        // ログイン中のユーザーがプロジェクトのオーナーか、または削除権限があるかを確認するロジックをここに追加することを検討
 
-        // プロジェクトIDを取得
-        $projectId = $request->input('projectId');
+        $project->users()->detach($user->id);
 
-        // プロジェクトを取得
-        $project = $user->projects()->findOrFail($projectId);
-
-        // ユーザーをプロジェクトから削除
-        $project->users()->detach($id); // $idは削除するユーザーのID
-
-        // 成功メッセージをセッションに保存してリダイレクト
-        return redirect()->route('users.index', ['project_id' => $projectId]);
+        return redirect()->route('users.index', ['project' => $project->id]);
     }
 }

@@ -10,15 +10,15 @@
 
                 <p class="py-4">このタスク「{{ $task->task_name }}」を本当に削除しますか？<br>この操作は元に戻せません。</p>
 
-            <form action="{{ route('tasks.destroy', ['task' => $task->id]) }}" method="POST">
-                @csrf
-                @method('DELETE')
+                <form action="{{ route('tasks.destroy', ['project' => $task->project_id, 'task' => $task->id]) }}" method="POST">
+                    @csrf
+                    @method('DELETE')
 
-                <div class="modal-action justify-center sm:justify-end">
-                    <button type="submit" class="btn btn-error">削除する</button>
-                    <button type="button" class="btn btn-ghost" @click="openModal = false">キャンセル</button>
-                </div>
-            </form>
+                    <div class="modal-action justify-center sm:justify-end">
+                        <button type="submit" class="btn btn-error">削除する</button>
+                        <button type="button" class="btn btn-ghost" @click="openModal = false">キャンセル</button>
+                    </div>
+                </form>
             </div>
             <div class="modal-backdrop" @click.self="openModal = false"></div>
         </div>

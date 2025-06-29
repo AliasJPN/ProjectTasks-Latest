@@ -7,28 +7,19 @@
                 <div class="modal-box relative">
                     <button class="btn btn-sm btn-circle absolute right-2 top-2" @click="openModal = false">✕</button>
 
-                    <h3 class="font-bold text-lg text-red-600">削除</h3> {{-- 警告色にするため text-red-600 を追加 --}}
+                    <h3 class="font-bold text-lg text-red-600">削除</h3>
 
-                    {{-- 削除確認メッセージ --}}
                     <p class="py-4">このユーザー「{{ $member->name }}」を本当に削除しますか？<br>この操作は元に戻せません。</p>
 
-                    {{-- 削除フォームを組み込みます --}}
-                    <form action="{{ route('users.destroy', ['user' => $member->id]) }}" method="POST">
-                        @csrf {{-- CSRF保護トークン --}}
-                        @method('DELETE') {{-- DELETEメソッドで削除リクエストを送信 --}}
+                    <form action="{{ route('users.destroy', ['project' => $project->id, 'user' => $member->id]) }}" method="POST">
+                        @csrf
+                        @method('DELETE')
 
-                        {{-- プロジェクトIDを隠しフィールドとして追加 --}}
-                        <input type="hidden" name="projectId" value="{{ $project->id }}">
-
-                        <div class="modal-action justify-center sm:justify-end"> {{-- ボタンを中央寄せまたは右寄せにする調整 --}}
-                            {{-- 削除実行ボタン --}}
+                        <div class="modal-action justify-center sm:justify-end">
                             <button type="submit" class="btn btn-error">削除する</button>
-                            {{-- モーダルを閉じるボタン（フォーム送信とは別） --}}
                             <button type="button" class="btn btn-ghost" @click="openModal = false">キャンセル</button>
                         </div>
                     </form>
-
-                    {{-- 削除フォームの組み込みここまで --}}
 
                 </div>
                 <div class="modal-backdrop" @click.self="openModal = false"></div>
